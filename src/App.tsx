@@ -6,6 +6,7 @@ const navItems = [
   { label: 'About', href: '#about' },
   { label: 'Skills', href: '#skills' },
   { label: 'Projects', href: '#projects' },
+  { label: 'Education', href: '#education' },
   { label: 'Certificates', href: '#certifications' },
   { label: 'Contact', href: '#contact' },
 ]
@@ -508,23 +509,49 @@ function App() {
         </div>
       </section>
 
-      <section className="content-section education-section" id="education">
-        <div className="section-heading">
-          <p className="section-kicker">04 / Education</p>
-          <h2>Learning with intention.</h2>
+      <section className="content-section education-section watercolor-education" id="education" aria-labelledby="education-title">
+        <div className="education-wash education-wash--rose" aria-hidden="true" />
+        <div className="education-wash education-wash--lavender" aria-hidden="true" />
+        <span className="education-doodle education-doodle--one" aria-hidden="true">✦</span>
+        <span className="education-doodle education-doodle--two" aria-hidden="true">✧</span>
+
+        <div className="section-heading section-heading-row education-heading">
+          <div>
+            <p className="section-kicker">04 / Education</p>
+            <h2 id="education-title">Learning with intention.</h2>
+          </div>
+          <p className="section-note">
+            Academic foundation combining robotics engineering and modern software development.
+          </p>
         </div>
+
         <div className="education-layout">
-          <article className="education-primary">
-            <span className="detail-label">2024 — 2028</span>
-            <h3>Bachelor of Technology (B.Tech)</h3>
+          <article className="education-primary-card">
+            <span className="edu-tape edu-tape--top" aria-hidden="true" />
+            <div className="edu-card-top">
+              <span className="edu-badge">2024 — 2028</span>
+              <span className="education-status">Expected graduation: 2028</span>
+            </div>
+            <h3 className="education-degree">Bachelor of Technology (B.Tech)</h3>
             <p className="education-branch">AI &amp; ML in Robotics Engineering</p>
             <p className="education-university">Garden City University</p>
-            <span className="education-status">Expected graduation: 2028</span>
           </article>
-          <div className="education-note">
-            <span className="detail-label">Academic focus</span>
-            <p>AI and machine learning applied to robotics, alongside a growing focus on web development.</p>
-          </div>
+
+          <aside className="education-focus-card">
+            <span className="focus-pin" aria-hidden="true" />
+            <div className="focus-header">
+              <span className="detail-label">Academic Focus &amp; Specialization</span>
+              <p className="focus-description">
+                AI and machine learning applied to robotics, alongside a growing focus on web development.
+              </p>
+            </div>
+            <div className="focus-domains">
+              <span className="domain-tag">Robotics Engineering</span>
+              <span className="domain-tag">Artificial Intelligence</span>
+              <span className="domain-tag">Machine Learning</span>
+              <span className="domain-tag">Web Development</span>
+            </div>
+          </aside>
         </div>
       </section>
 
