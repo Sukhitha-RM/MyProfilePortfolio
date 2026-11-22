@@ -7,6 +7,7 @@ const navItems = [
   { label: 'Skills', href: '#skills' },
   { label: 'Projects', href: '#projects' },
   { label: 'Education', href: '#education' },
+  { label: 'Experience', href: '#experience' },
   { label: 'Certificates', href: '#certifications' },
   { label: 'Contact', href: '#contact' },
 ]
@@ -96,6 +97,15 @@ function SkillIllustration({ category }: { category: string }) {
   }
 }
 
+function WatercolorDetails() {
+  return (
+    <>
+      <span className="wc-paint-mark wc-paint-mark--one" aria-hidden="true" />
+      <span className="wc-paint-mark wc-paint-mark--two" aria-hidden="true" />
+    </>
+  )
+}
+
 function App() {
   const [menuOpen, setMenuOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
@@ -105,6 +115,87 @@ function App() {
     const onScroll = () => setScrolled(window.scrollY > 20)
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+
+  useEffect(() => {
+    const revealNodes = Array.from(
+      document.querySelectorAll<HTMLElement>('[data-watercolor-reveal]')
+    )
+
+    if (
+      revealNodes.length === 0 ||
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches ||
+      !('IntersectionObserver' in window)
+    ) {
+      revealNodes.forEach((node) => node.classList.add('is-painted'))
+      return
+    }
+
+    document.documentElement.classList.add('watercolor-ready')
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return
+          entry.target.classList.add('is-painted')
+          observer.unobserve(entry.target)
+        })
+      },
+      {
+        threshold: 0,
+        rootMargin: '0px 0px -8% 0px',
+      }
+    )
+
+    revealNodes.forEach((node) => observer.observe(node))
+
+    let scrollFrame = 0
+    const revealVisibleNodes = () => {
+      cancelAnimationFrame(scrollFrame)
+      scrollFrame = requestAnimationFrame(() => {
+        revealNodes.forEach((node) => {
+          if (node.classList.contains('is-painted')) return
+          const rect = node.getBoundingClientRect()
+          if (rect.bottom > 24 && rect.top < window.innerHeight - 24) {
+            node.classList.add('is-painted')
+            observer.unobserve(node)
+          }
+        })
+      })
+    }
+    window.addEventListener('scroll', revealVisibleNodes, { passive: true })
+    document.addEventListener('scroll', revealVisibleNodes, { passive: true })
+    window.addEventListener('resize', revealVisibleNodes, { passive: true })
+    revealVisibleNodes()
+    const revealCheck = window.setTimeout(revealVisibleNodes, 120)
+    const revealCheckLate = window.setTimeout(revealVisibleNodes, 600)
+    const revealSweep = window.setInterval(() => {
+      revealVisibleNodes()
+      if (revealNodes.every((node) => node.classList.contains('is-painted'))) {
+        window.clearInterval(revealSweep)
+      }
+    }, 300)
+
+    // Cover browsers and layouts that report an initial zero-area intersection
+    // for a freshly clipped section by checking the viewport once after setup.
+    revealNodes.forEach((node) => {
+      const rect = node.getBoundingClientRect()
+      if (rect.bottom > 0 && rect.top < window.innerHeight) {
+        node.classList.add('is-painted')
+        observer.unobserve(node)
+      }
+    })
+
+    return () => {
+      cancelAnimationFrame(scrollFrame)
+      window.clearTimeout(revealCheck)
+      window.clearTimeout(revealCheckLate)
+      window.clearInterval(revealSweep)
+      window.removeEventListener('scroll', revealVisibleNodes)
+      document.removeEventListener('scroll', revealVisibleNodes)
+      window.removeEventListener('resize', revealVisibleNodes)
+      observer.disconnect()
+    }
   }, [])
 
   useEffect(() => {
@@ -162,7 +253,8 @@ function App() {
 
       <main className="portfolio-shell">
 
-      <section className="hero-section journal-hero" id="home" aria-labelledby="hero-name">
+      <section className="hero-section journal-hero wc-reveal wc-reveal--wash" id="home" aria-labelledby="hero-name" data-watercolor-reveal>
+        <WatercolorDetails />
         <div className="hero-paper-grain" aria-hidden="true" />
         <div className="paint-wash paint-wash--rose" aria-hidden="true" />
         <div className="paint-wash paint-wash--violet" aria-hidden="true" />
@@ -262,12 +354,13 @@ function App() {
         </div>
       </section>
 
-      <section className="scroll-cue" aria-label="Scroll for more">
+      <section className="scroll-cue wc-reveal" aria-label="Scroll for more" data-watercolor-reveal>
         <span className="scroll-line" />
         <span>Scroll to explore</span>
       </section>
 
-      <section className="content-section about-section scrapbook-about" id="about" aria-labelledby="about-title">
+      <section className="content-section about-section scrapbook-about wc-reveal wc-reveal--wash" id="about" aria-labelledby="about-title" data-watercolor-reveal>
+        <WatercolorDetails />
         <div className="about-wash about-wash--pink" aria-hidden="true" />
         <div className="about-wash about-wash--purple" aria-hidden="true" />
         <div className="about-heading">
@@ -401,7 +494,8 @@ function App() {
         </div>
       </section>
 
-      <section className="content-section skills-section watercolor-skills" id="skills" aria-labelledby="skills-title">
+      <section className="content-section skills-section watercolor-skills wc-reveal wc-reveal--wash" id="skills" aria-labelledby="skills-title" data-watercolor-reveal>
+        <WatercolorDetails />
         <div className="skills-wash skills-wash--left" aria-hidden="true" />
         <div className="skills-wash skills-wash--right" aria-hidden="true" />
         <span className="skills-doodle skills-doodle--one" aria-hidden="true">✦</span>
@@ -435,7 +529,8 @@ function App() {
         </div>
       </section>
 
-      <section className="content-section projects-section watercolor-projects" id="projects" aria-labelledby="projects-title">
+      <section className="content-section projects-section watercolor-projects wc-reveal wc-reveal--wash" id="projects" aria-labelledby="projects-title" data-watercolor-reveal>
+        <WatercolorDetails />
         <div className="projects-wash projects-wash--left" aria-hidden="true" />
         <div className="projects-wash projects-wash--right" aria-hidden="true" />
         <span className="projects-doodle projects-doodle--one" aria-hidden="true">✦</span>
@@ -509,7 +604,8 @@ function App() {
         </div>
       </section>
 
-      <section className="content-section education-section watercolor-education" id="education" aria-labelledby="education-title">
+      <section className="content-section education-section watercolor-education wc-reveal wc-reveal--wash" id="education" aria-labelledby="education-title" data-watercolor-reveal>
+        <WatercolorDetails />
         <div className="education-wash education-wash--rose" aria-hidden="true" />
         <div className="education-wash education-wash--lavender" aria-hidden="true" />
         <span className="education-doodle education-doodle--one" aria-hidden="true">✦</span>
@@ -555,14 +651,64 @@ function App() {
         </div>
       </section>
 
-      <section className="content-section certifications-section watercolor-certificates" id="certifications" aria-labelledby="certifications-title">
+      <section className="content-section experience-section watercolor-experience wc-reveal wc-reveal--wash" id="experience" aria-labelledby="experience-title" data-watercolor-reveal>
+        <WatercolorDetails />
+        <div className="experience-wash experience-wash--rose" aria-hidden="true" />
+        <div className="experience-wash experience-wash--lavender" aria-hidden="true" />
+        <span className="experience-doodle experience-doodle--one" aria-hidden="true">✦</span>
+        <span className="experience-doodle experience-doodle--two" aria-hidden="true">✧</span>
+
+        <div className="section-heading section-heading-row experience-heading">
+          <div>
+            <p className="section-kicker">05 / Experience</p>
+            <h2 id="experience-title">Leading teams with purpose.</h2>
+          </div>
+          <p className="section-note">
+            Leadership, coordination and marketing within MAVROS.
+          </p>
+        </div>
+
+        <article className="experience-card">
+          <div className="experience-logo-panel" aria-label="MAVROS organization">
+            <span className="experience-logo-tape experience-logo-tape--top" aria-hidden="true" />
+            <img
+              className="experience-logo"
+              src="/images/mavros-logo.png"
+              alt="MAVROS logo"
+            />
+          </div>
+
+          <div className="experience-details">
+            <div className="experience-role-header">
+              <div>
+                <p className="experience-company">MAVROS</p>
+                <h3>Executive Director <span>(ED)</span></h3>
+              </div>
+              <span className="experience-role-badge">Leadership</span>
+            </div>
+            <div className="experience-description">
+              <p>
+                As Executive Director at MAVROS, I contribute to leadership, team coordination,
+                and the organization&apos;s overall direction.
+              </p>
+              <p>
+                I also manage the marketing team, guiding its activities and ensuring that the
+                team&apos;s efforts align with MAVROS&apos;s goals and vision.
+              </p>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <section className="content-section certifications-section watercolor-certificates wc-reveal wc-reveal--wash" id="certifications" aria-labelledby="certifications-title" data-watercolor-reveal>
+        <WatercolorDetails />
         <div className="certificates-wash certificates-wash--rose" aria-hidden="true" />
         <div className="certificates-wash certificates-wash--lavender" aria-hidden="true" />
         <span className="certificates-doodle certificates-doodle--one" aria-hidden="true">✦</span>
         <span className="certificates-doodle certificates-doodle--two" aria-hidden="true">✧</span>
         <div className="section-heading section-heading-row certificates-heading">
           <div>
-            <p className="section-kicker">05 / Certifications</p>
+            <p className="section-kicker">06 / Certifications</p>
             <h2 id="certifications-title">Proof of continued learning.</h2>
           </div>
           <p className="section-note">
@@ -647,7 +793,7 @@ function App() {
               {activeCertificate.file.endsWith('.pdf') ? (
                 <iframe title={activeCertificate.title} src={activeCertificate.file} />
               ) : (
-                <img src={activeCertificate.file} alt={activeCertificate.title} />
+                <img className="certificate-modal-image" src={activeCertificate.file} alt={activeCertificate.title} />
               )}
             </div>
             <a className="certificate-modal-link" href={activeCertificate.file} target="_blank" rel="noreferrer">
@@ -657,7 +803,8 @@ function App() {
         </div>
       )}
 
-      <section className="content-section contact-section watercolor-contact" id="contact" aria-labelledby="contact-title">
+      <section className="content-section contact-section watercolor-contact wc-reveal wc-reveal--wash" id="contact" aria-labelledby="contact-title" data-watercolor-reveal>
+        <WatercolorDetails />
         <div className="contact-wash contact-wash--rose" aria-hidden="true" />
         <div className="contact-wash contact-wash--lavender" aria-hidden="true" />
         <svg className="contact-flower contact-flower--left" viewBox="0 0 200 242" aria-hidden="true">
@@ -690,7 +837,7 @@ function App() {
         </svg>
         <div className="contact-journal">
           <div className="contact-heading">
-            <p className="section-kicker">06 / Contact</p>
+            <p className="section-kicker">07 / Contact</p>
             <p className="contact-hand-note">leave a little note</p>
             <h2 id="contact-title">Let&apos;s make something meaningful.</h2>
             <p>Have an idea or an opportunity to share? I&apos;d be happy to hear from you.</p>

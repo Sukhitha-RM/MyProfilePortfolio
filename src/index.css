@@ -21,11 +21,11 @@
 
   /* ── Warm Blush Background & Editorial Surfaces ── */
   /* Slightly darker, warm blush-pink background */
-  --bg-blush:      #F5E7E8;
-  --bg-blush-soft: #F9EFEF;
-  --bg-paper:      #F7ECEC;
+  --bg-blush:      #EDD0D5;
+  --bg-blush-soft: #F1DFE2;
+  --bg-paper:      #EFD8DC;
   --bg:            var(--bg-blush);
-  --surface:       #F2DFE2;
+  --surface:       #E7C7CD;
   --surface-card:  rgba(255, 252, 252, 0.95);
   --surface-panel: rgba(248, 237, 238, 0.88);
 
@@ -119,6 +119,8 @@ body {
   min-width: 320px;
   margin: 0;
   position: relative;
+  isolation: isolate;
+  overflow-x: hidden;
 
   /* ── Warm blush-pink background with subtle dual-palette gradients ── */
   background-color: var(--bg-blush);
@@ -135,6 +137,28 @@ body {
     radial-gradient(ellipse 50% 40% at 14% 72%, rgba(116, 9, 56, 0.10), transparent 55%);
 }
 
+/* 3D watercolor atmosphere — fixed, decorative layers span every page section.
+   Soft radial blooms emulate wet paint floating on the paper rather than DOM cards. */
+body::after {
+  content: '';
+  position: fixed;
+  z-index: 0;
+  inset: -12%;
+  pointer-events: none;
+  opacity: 0.72;
+  mix-blend-mode: multiply;
+  transform-origin: 50% 50%;
+  background:
+    radial-gradient(ellipse 17% 24% at 12% 18%, rgba(170, 112, 190, 0.20), rgba(170, 112, 190, 0.07) 48%, transparent 70%),
+    radial-gradient(ellipse 20% 15% at 86% 24%, rgba(239, 136, 173, 0.18), rgba(239, 136, 173, 0.05) 54%, transparent 72%),
+    radial-gradient(ellipse 16% 28% at 78% 68%, rgba(116, 74, 154, 0.16), rgba(116, 74, 154, 0.04) 55%, transparent 74%),
+    radial-gradient(ellipse 18% 16% at 25% 82%, rgba(204, 43, 82, 0.13), rgba(204, 43, 82, 0.03) 52%, transparent 72%),
+    radial-gradient(ellipse 12% 20% at 54% 46%, rgba(175, 23, 64, 0.10), transparent 68%);
+  filter: blur(10px) saturate(0.92);
+  will-change: transform, filter;
+  animation: ambient-paint-breathe 16s ease-in-out infinite alternate;
+}
+
 /* ── Paper grain texture (pure CSS) ── */
 body::before {
   content: '';
@@ -146,6 +170,28 @@ body::before {
   mix-blend-mode: multiply;
   background-image:
     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23g)' opacity='0.08'/%3E%3C/svg%3E");
+}
+
+@keyframes ambient-paint-breathe {
+  0% {
+    transform: perspective(900px) translate3d(-1.2%, -0.6%, 0) rotate(-1.2deg) scale(1);
+    filter: blur(10px) saturate(0.92);
+  }
+  42% {
+    transform: perspective(900px) translate3d(1.4%, 0.8%, 18px) rotate(1deg) scale(1.035);
+    filter: blur(12px) saturate(1);
+  }
+  100% {
+    transform: perspective(900px) translate3d(-0.4%, 1.6%, -8px) rotate(-0.35deg) scale(1.02);
+    filter: blur(9px) saturate(0.96);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body::after {
+    animation: none;
+    transform: none;
+  }
 }
 
 /* ---------- Typography ---------- */

@@ -1,4 +1,6 @@
 .portfolio-shell {
+  position: relative;
+  z-index: 1;
   width: min(1180px, 100%);
   min-height: 100svh;
   margin: 0 auto;
@@ -8,13 +10,389 @@
 }
 
 /* ============================================================
+   Watercolor reveal foundation
+   Default state is fully visible; animation is opt-in through
+   the .watercolor-ready root class added only by the React effect.
+   ============================================================ */
+.wc-reveal {
+  will-change: opacity, clip-path, filter;
+}
+
+.watercolor-ready .wc-reveal:not(.is-painted) {
+  opacity: 0.62;
+  filter: saturate(0.58) blur(5px);
+  clip-path: ellipse(7% 5% at 18% 36%);
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1000' height='700' viewBox='0 0 1000 700'%3E%3Cfilter id='rough'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.018 .028' numOctaves='3' seed='8' result='noise'/%3E%3CfeDisplacementMap in='SourceGraphic' in2='noise' scale='18'/%3E%3C/filter%3E%3Crect x='12' y='12' width='976' height='676' rx='48' fill='white' filter='url(%23rough)'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1000' height='700' viewBox='0 0 1000 700'%3E%3Cfilter id='rough'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.018 .028' numOctaves='3' seed='8' result='noise'/%3E%3CfeDisplacementMap in='SourceGraphic' in2='noise' scale='18'/%3E%3C/filter%3E%3Crect x='12' y='12' width='976' height='676' rx='48' fill='white' filter='url(%23rough)'/%3E%3C/svg%3E");
+  -webkit-mask-size: 138% 138%;
+  mask-size: 138% 138%;
+  -webkit-mask-position: 18% 36%;
+  mask-position: 18% 36%;
+  transform: translateY(26px) scale(0.985);
+  transform-origin: 18% 36%;
+}
+
+.watercolor-ready .wc-reveal--wash:not(.is-painted) {
+  box-shadow:
+    inset 24px 18px 54px rgba(222, 124, 125, 0.18),
+    inset -32px -22px 58px rgba(165, 56, 96, 0.14);
+}
+
+.watercolor-ready .wc-reveal.is-painted {
+  opacity: 1;
+  filter: none;
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+  -webkit-mask-image: none;
+  mask-image: none;
+  transform: translateY(0) scale(1);
+  transition:
+    opacity 1050ms var(--ease-out),
+    clip-path 1550ms cubic-bezier(0.16, 1, 0.3, 1),
+    filter 1250ms var(--ease-out),
+    transform 1050ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* The existing section wash and pool elements bloom first, then settle.
+   These are decorative only and inherit their original layout/position. */
+.watercolor-ready .wc-reveal:not(.is-painted) [class*="-wash"],
+.watercolor-ready .wc-reveal:not(.is-painted) [class*="-pool"] {
+  opacity: 0;
+  filter: blur(12px);
+  transform: scale(0.58);
+  transform-origin: 35% 55%;
+}
+
+.watercolor-ready .wc-reveal.is-painted [class*="-wash"],
+.watercolor-ready .wc-reveal.is-painted [class*="-pool"] {
+  transition:
+    opacity 1450ms var(--ease-out),
+    filter 1550ms var(--ease-out),
+    transform 1700ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.watercolor-ready .scroll-cue.is-painted {
+  transition-duration: 500ms;
+}
+
+/* Text: a brush stroke opens horizontally, with the same soft upward settle.
+   Text is never removed or made unreadable, including while being revealed. */
+.watercolor-ready .wc-reveal:not(.is-painted) :is(
+  .hero-name,
+  .scrapbook-about h2,
+  .section-heading h2,
+  .contact-heading h2
+) {
+  opacity: 0.72;
+  clip-path: polygon(0 43%, 8% 37%, 24% 40%, 39% 31%, 57% 36%, 76% 28%, 94% 34%, 100% 29%, 100% 68%, 92% 64%, 73% 72%, 54% 67%, 35% 74%, 17% 68%, 0 74%);
+  filter: blur(0.8px);
+  transform: translateY(10px);
+  transform-origin: left 50%;
+}
+
+.watercolor-ready .wc-reveal.is-painted :is(
+  .hero-name,
+  .scrapbook-about h2,
+  .section-heading h2,
+  .contact-heading h2
+) {
+  opacity: 1;
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+  filter: none;
+  transform: translateY(0);
+  transition:
+    opacity 850ms var(--ease-out),
+    clip-path 1250ms var(--ease-out),
+    filter 900ms var(--ease-out),
+    transform 900ms var(--ease-out);
+}
+
+/* Existing photographs and project/certificate artwork are masked in place.
+   Their intrinsic size, dimensions and object-fit rules remain untouched. */
+.watercolor-ready .wc-reveal:not(.is-painted) :is(
+  .portrait-frame,
+  .about-photo-frame,
+  .project-canvas,
+  .certificate-preview-frame,
+  .certificate-modal-image
+) {
+  opacity: 0.18;
+  filter: saturate(0.68) blur(7px);
+  clip-path: ellipse(9% 8% at 48% 46%);
+  transform: translateY(13px) scale(0.988);
+  transform-origin: 48% 46%;
+}
+
+.watercolor-ready .wc-reveal.is-painted :is(
+  .portrait-frame,
+  .about-photo-frame,
+  .project-canvas,
+  .certificate-preview-frame,
+  .certificate-modal-image
+) {
+  opacity: 1;
+  filter: none;
+  clip-path: ellipse(78% 72% at 50% 50%);
+  transform: translateY(0) scale(1);
+  transition:
+    opacity 1100ms var(--ease-out),
+    clip-path 1500ms cubic-bezier(0.16, 1, 0.3, 1),
+    filter 1150ms var(--ease-out),
+    transform 1050ms var(--ease-out);
+}
+
+/* Small original-mark details: no additional text or assets are introduced.
+   They are decorative, pointer-free and stay well outside the content flow. */
+.wc-paint-mark {
+  position: absolute;
+  z-index: 0;
+  width: 30px;
+  height: 18px;
+  border-radius: 64% 36% 58% 42% / 48% 59% 41% 52%;
+  pointer-events: none;
+  opacity: 0.18;
+  background:
+    radial-gradient(circle at 20% 48%, #740938 0 2px, transparent 3px),
+    radial-gradient(circle at 58% 35%, #AF1740 0 3px, transparent 4px),
+    radial-gradient(ellipse at 70% 62%, rgba(204, 43, 82, 0.58), transparent 65%);
+  filter: blur(0.25px);
+  transform: rotate(-12deg) scale(0.72);
+  transition:
+    opacity 900ms var(--ease-out),
+    transform 1400ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.wc-paint-mark::before,
+.wc-paint-mark::after {
+  position: absolute;
+  content: '';
+  pointer-events: none;
+  border-radius: 50%;
+  background: #DE7C7D;
+}
+
+.wc-paint-mark::before {
+  top: -5px;
+  left: 3px;
+  width: 5px;
+  height: 5px;
+  opacity: 0.58;
+}
+
+.wc-paint-mark::after {
+  right: -4px;
+  bottom: 2px;
+  width: 3px;
+  height: 3px;
+  background: #CC2B52;
+  opacity: 0.48;
+}
+
+.wc-paint-mark--one {
+  top: 11%;
+  left: 2.5%;
+}
+
+.wc-paint-mark--two {
+  right: 3%;
+  bottom: 9%;
+  opacity: 0.14;
+  transform: rotate(21deg) scale(0.68);
+}
+
+.watercolor-ready .wc-reveal.is-painted .wc-paint-mark {
+  opacity: 0.24;
+  transform: rotate(-12deg) scale(1);
+}
+
+.watercolor-ready .wc-reveal.is-painted .wc-paint-mark--two {
+  opacity: 0.18;
+  transform: rotate(21deg) scale(1);
+  transition-delay: 180ms;
+}
+
+/* Soft hand-painted wash where each section meets the next. */
+.watercolor-ready .wc-reveal.is-painted {
+  box-shadow:
+    inset 0 18px 34px rgba(222, 124, 125, 0.018),
+    inset 0 -18px 34px rgba(116, 9, 56, 0.018);
+}
+
+/* 3D card motion — cards remain fully readable and retain their scrapbook tilt.
+   Hover and keyboard focus lift the paper surface toward the visitor. */
+.skill-gallery,
+.interest-cards,
+.about-records,
+.education-layout,
+.project-gallery,
+.certificate-gallery,
+.contact-journal {
+  perspective: 1200px;
+}
+
+.about-bio-card,
+.about-record,
+.interest-card,
+.education-primary-card,
+.education-focus-card,
+.project-canvas,
+.project-info-paper,
+.certificate-paper,
+.contact-paper,
+.watercolor-skills .skill-card {
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+  transition:
+    transform 420ms var(--ease-out),
+    box-shadow 420ms var(--ease-out),
+    border-color 320ms var(--ease-out),
+    filter 420ms var(--ease-out);
+}
+
+.about-bio-card:hover,
+.about-bio-card:focus-within {
+  transform: translateY(-5px) rotateX(1deg) rotateZ(-0.25deg);
+  box-shadow: 0 18px 34px rgba(58, 5, 25, 0.12);
+}
+
+.about-record:hover,
+.about-record:focus-within,
+.education-primary-card:hover,
+.education-primary-card:focus-within,
+.education-focus-card:hover,
+.education-focus-card:focus-within,
+.contact-paper:hover,
+.contact-paper:focus-within {
+  filter: saturate(1.02);
+  box-shadow: 0 17px 30px rgba(58, 5, 25, 0.13);
+  transform: translateY(-7px) rotateX(1.2deg) rotateZ(0.35deg);
+}
+
+.interest-card:hover,
+.interest-card:focus-within {
+  box-shadow: 0 16px 24px rgba(58, 5, 25, 0.13);
+  transform: translateY(-8px) rotateX(3deg) rotateY(-2deg) rotateZ(0.5deg);
+}
+
+.watercolor-skills .skill-card:hover,
+.watercolor-skills .skill-card:focus-within {
+  border-color: color-mix(in srgb, var(--skill-ink) 48%, transparent);
+  box-shadow: 0 20px 32px rgba(77, 57, 45, 0.16), 0 4px 8px rgba(77, 57, 45, 0.08);
+  transform: translateY(-9px) rotateX(2.2deg) rotateY(1.8deg) rotateZ(0.35deg);
+}
+
+.project-artwork:hover .project-canvas,
+.project-artwork:focus-within .project-canvas {
+  box-shadow: 0 28px 42px rgba(73, 54, 44, 0.20), 0 5px 10px rgba(73, 54, 44, 0.10);
+  transform: translateY(-9px) rotateX(1.5deg) rotateY(-1.2deg) rotateZ(-0.6deg);
+}
+
+.project-artwork:hover .project-info-paper,
+.project-artwork:focus-within .project-info-paper {
+  box-shadow: 0 20px 34px rgba(81, 59, 47, 0.13);
+  transform: translateY(-6px) rotateX(1deg) rotateZ(0.25deg);
+}
+
+.certificate-paper:hover,
+.certificate-paper:focus-within {
+  box-shadow: 0 21px 34px rgba(78, 57, 46, 0.16), 0 5px 9px rgba(78, 57, 46, 0.08);
+  transform: translateY(-9px) rotateX(2deg) rotateY(-1.5deg) rotateZ(0.25deg);
+}
+
+.contact-paper:hover,
+.contact-paper:focus-within {
+  transform: translateY(-7px) rotateX(1.2deg) rotateZ(0.35deg);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .watercolor-ready .wc-reveal.is-painted .about-bio-card,
+  .watercolor-ready .wc-reveal.is-painted .about-record,
+  .watercolor-ready .wc-reveal.is-painted .interest-card,
+  .watercolor-ready .wc-reveal.is-painted .education-primary-card,
+  .watercolor-ready .wc-reveal.is-painted .education-focus-card,
+  .watercolor-ready .wc-reveal.is-painted .project-canvas,
+  .watercolor-ready .wc-reveal.is-painted .project-info-paper,
+  .watercolor-ready .wc-reveal.is-painted .certificate-paper,
+  .watercolor-ready .wc-reveal.is-painted .contact-paper,
+  .watercolor-ready .wc-reveal.is-painted .skill-card {
+    animation: card-painted-in 850ms var(--ease-out) both;
+  }
+
+  .watercolor-ready .wc-reveal.is-painted :is(.about-record, .interest-card, .skill-card, .certificate-paper):nth-child(2n) {
+    animation-delay: 100ms;
+  }
+
+  .watercolor-ready .wc-reveal.is-painted :is(.about-record, .interest-card, .skill-card, .certificate-paper):nth-child(3n) {
+    animation-delay: 180ms;
+  }
+}
+
+@keyframes card-painted-in {
+  from {
+    opacity: 0.72;
+    filter: saturate(0.72) blur(1.2px);
+    transform: translateY(18px) translateZ(-16px) rotateX(4deg) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    filter: none;
+  }
+}
+
+@media (max-width: 760px) {
+  .watercolor-ready .wc-reveal:not(.is-painted) {
+    transform: translateY(14px) scale(0.996);
+  }
+
+  .watercolor-ready .wc-reveal.is-painted {
+    transition-duration: 800ms;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .watercolor-ready .wc-reveal,
+  .watercolor-ready .wc-reveal.is-painted {
+    transition: none;
+    transform: none;
+    filter: none;
+  }
+
+  .watercolor-ready .wc-reveal:not(.is-painted) {
+    opacity: 1;
+    clip-path: none;
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+
+  .watercolor-ready .wc-reveal :is(
+    .hero-name,
+    .scrapbook-about h2,
+    .section-heading h2,
+    .contact-heading h2,
+    .portrait-frame,
+    .about-photo-frame,
+    .project-canvas,
+    .certificate-preview-frame,
+    .certificate-modal-image
+  ) {
+    opacity: 1;
+    clip-path: none;
+    filter: none;
+    transform: none;
+  }
+
+  .wc-paint-mark {
+    transition: none;
+  }
+}
+
+/* ============================================================
    Navigation — Whimsical Watercolor Editorial
    ============================================================ */
 .site-nav {
   position: sticky;
   top: 0;
   z-index: 100;
-  background: rgba(245, 231, 232, 0.88);
+  background: rgba(237, 208, 213, 0.88);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
   border-bottom: 1.5px solid transparent;
@@ -25,7 +403,7 @@
 }
 
 .site-nav--scrolled {
-  background: rgba(245, 231, 232, 0.96);
+  background: rgba(237, 208, 213, 0.96);
   border-bottom-color: rgba(116, 9, 56, 0.14);
   box-shadow: 0 4px 20px rgba(58, 5, 25, 0.07);
 }
@@ -251,7 +629,7 @@
     align-items: center;
     gap: 0;
     padding: 12px 24px 28px;
-    background: rgba(245, 231, 232, 0.98);
+    background: rgba(237, 208, 213, 0.98);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
     border-bottom: 1.5px solid rgba(116, 9, 56, 0.14);
@@ -313,7 +691,7 @@
   border-radius: 34px 16px 42px 18px;
   background:
     linear-gradient(114deg, rgba(255, 252, 252, 0.94), rgba(246, 234, 235, 0.88)),
-    #F5E7E8;
+    var(--bg-blush);
   box-shadow: 0 18px 50px rgba(58, 5, 25, 0.08), inset 0 0 0 7px rgba(255, 255, 255, 0.35);
 }
 
@@ -1017,7 +1395,7 @@
   border-radius: 38px 16px 30px 14px;
   background:
     linear-gradient(114deg, rgba(255, 252, 252, 0.94), rgba(246, 234, 235, 0.88)),
-    #F5E7E8;
+    var(--bg-blush);
   box-shadow: 0 18px 45px rgba(58, 5, 25, 0.07), inset 0 0 0 7px rgba(255, 255, 255, 0.35);
 }
 
@@ -1151,7 +1529,7 @@
   overflow: hidden;
   border: 1px solid rgba(116, 9, 56, 0.16);
   border-radius: 2px;
-  background: #F5E7E8;
+  background: var(--bg-blush);
 }
 
 .about-photo-frame::after {
@@ -1686,7 +2064,7 @@
   border-radius: 28px 16px 36px 14px;
   background:
     linear-gradient(116deg, rgba(255, 252, 252, 0.94), rgba(246, 234, 235, 0.88)),
-    #F5E7E8;
+    var(--bg-blush);
   box-shadow: 0 18px 45px rgba(58, 5, 25, 0.07), inset 0 0 0 7px rgba(255, 255, 255, 0.35);
 }
 
@@ -2331,7 +2709,7 @@
   border-radius: 17px 38px 14px 31px;
   background:
     linear-gradient(116deg, rgba(255, 252, 252, 0.94), rgba(246, 234, 235, 0.88)),
-    #F5E7E8;
+    var(--bg-blush);
   box-shadow: 0 18px 45px rgba(58, 5, 25, 0.07), inset 0 0 0 7px rgba(255, 255, 255, 0.35);
 }
 
@@ -2689,7 +3067,7 @@
   border-radius: 34px 13px 22px 18px;
   background:
     linear-gradient(116deg, rgba(255, 252, 252, 0.94), rgba(246, 234, 235, 0.88)),
-    #F5E7E8;
+    var(--bg-blush);
   box-shadow: 0 18px 45px rgba(58, 5, 25, 0.07), inset 0 0 0 7px rgba(255, 255, 255, 0.35);
 }
 
@@ -3143,6 +3521,259 @@
 }
 
 /* ============================================================
+   Experience — MAVROS Editorial Card
+   ============================================================ */
+.watercolor-experience {
+  position: relative;
+  isolation: isolate;
+  margin-top: 32px;
+  padding: clamp(76px, 9vw, 118px) clamp(18px, 4.5vw, 54px) clamp(78px, 9vw, 116px);
+  overflow: hidden;
+  border: 1px solid rgba(116, 9, 56, 0.15);
+  border-radius: 34px 16px 28px 18px;
+  background:
+    linear-gradient(116deg, rgba(255, 252, 252, 0.94), rgba(246, 234, 235, 0.88)),
+    var(--bg-blush);
+  box-shadow: 0 18px 45px rgba(58, 5, 25, 0.07), inset 0 0 0 7px rgba(255, 255, 255, 0.35);
+}
+
+.watercolor-experience::before {
+  position: absolute;
+  z-index: -1;
+  inset: 18px;
+  content: '';
+  border: 1px solid rgba(116, 9, 56, 0.13);
+  border-radius: 24px 8px 18px 10px;
+  pointer-events: none;
+}
+
+.experience-wash {
+  position: absolute;
+  z-index: -1;
+  border-radius: 50%;
+  pointer-events: none;
+  mix-blend-mode: multiply;
+}
+
+.experience-wash--rose {
+  top: 8%;
+  right: -170px;
+  width: 390px;
+  height: 330px;
+  background: radial-gradient(ellipse, rgba(222, 124, 125, 0.24), rgba(222, 124, 125, 0.06) 58%, transparent 73%);
+  transform: rotate(18deg);
+}
+
+.experience-wash--lavender {
+  bottom: -130px;
+  left: -140px;
+  width: 390px;
+  height: 290px;
+  background: radial-gradient(ellipse, rgba(165, 56, 96, 0.20), rgba(165, 56, 96, 0.05) 58%, transparent 73%);
+  transform: rotate(-14deg);
+}
+
+.experience-doodle {
+  position: absolute;
+  z-index: 1;
+  color: #aa7284;
+  font-family: var(--hand);
+  line-height: 1;
+  pointer-events: none;
+}
+
+.experience-doodle--one {
+  top: 48px;
+  right: 8.5%;
+  font-size: 27px;
+  transform: rotate(17deg);
+}
+
+.experience-doodle--two {
+  bottom: 21%;
+  left: 20px;
+  color: #8f7ca9;
+  font-size: 22px;
+  transform: rotate(-11deg);
+}
+
+.experience-heading {
+  position: relative;
+  z-index: 1;
+  margin-bottom: clamp(38px, 5.5vw, 60px);
+}
+
+.experience-card {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: minmax(220px, 0.72fr) minmax(0, 1.28fr);
+  gap: clamp(22px, 4vw, 44px);
+  align-items: stretch;
+  padding: clamp(20px, 3vw, 30px);
+  border: 1px solid rgba(116, 9, 56, 0.18);
+  border-radius: 18px 28px 16px 24px;
+  background: rgba(255, 253, 253, 0.88);
+  box-shadow: 0 16px 34px rgba(58, 5, 25, 0.08);
+  transform: rotate(-0.25deg);
+  transform-style: preserve-3d;
+  transition:
+    transform 420ms var(--ease-out),
+    box-shadow 420ms var(--ease-out),
+    border-color 320ms var(--ease-out);
+}
+
+.experience-card:hover,
+.experience-card:focus-within {
+  border-color: rgba(116, 9, 56, 0.28);
+  box-shadow: 0 21px 38px rgba(58, 5, 25, 0.12);
+  transform: translateY(-7px) rotateX(1.2deg) rotateZ(0.25deg);
+}
+
+.experience-logo-panel {
+  position: relative;
+  display: grid;
+  min-height: 250px;
+  place-items: center;
+  overflow: hidden;
+  border: 1px solid rgba(116, 9, 56, 0.16);
+  border-radius: 12px 20px 12px 18px;
+  background: #050715;
+  box-shadow: inset 0 0 0 7px rgba(255, 255, 255, 0.025);
+}
+
+.experience-logo-tape {
+  position: absolute;
+  z-index: 2;
+  top: -10px;
+  left: 28px;
+  width: 82px;
+  height: 20px;
+  border-right: 1px solid rgba(116, 9, 56, 0.10);
+  border-left: 1px solid rgba(116, 9, 56, 0.10);
+  background: rgba(222, 124, 125, 0.34);
+  transform: rotate(-3deg);
+}
+
+.experience-logo {
+  display: block;
+  width: 82%;
+  max-width: 270px;
+  height: auto;
+  max-height: 210px;
+  object-fit: contain;
+}
+
+.experience-details {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+  padding: clamp(12px, 2.5vw, 26px) clamp(4px, 1.5vw, 16px);
+}
+
+.experience-role-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 18px;
+}
+
+.experience-company {
+  margin: 0 0 4px;
+  color: var(--raspberry);
+  font-family: var(--sans);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.experience-role-header h3 {
+  margin: 0;
+  color: var(--dark-wine);
+  font-size: clamp(27px, 3.2vw, 38px);
+  font-weight: 500;
+  letter-spacing: -0.025em;
+  line-height: 1.12;
+}
+
+.experience-role-header h3 span {
+  color: var(--raspberry);
+  font-family: var(--sans);
+  font-size: 0.48em;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  vertical-align: 0.25em;
+}
+
+.experience-role-badge {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 12px;
+  border: 1px solid rgba(175, 23, 64, 0.28);
+  border-radius: 999px;
+  background: rgba(175, 23, 64, 0.10);
+  color: var(--raspberry);
+  font-family: var(--sans);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+}
+
+.experience-description {
+  padding-left: 18px;
+  border-left: 2px solid rgba(175, 23, 64, 0.22);
+}
+
+.experience-description p {
+  max-width: 620px;
+  margin: 0;
+  color: var(--text);
+  font-size: clamp(14.5px, 1.5vw, 16.5px);
+  line-height: 1.72;
+}
+
+.experience-description p + p {
+  margin-top: 12px;
+}
+
+@media (max-width: 760px) {
+  .experience-card {
+    grid-template-columns: 1fr;
+  }
+
+  .experience-logo-panel {
+    min-height: 220px;
+  }
+
+  .experience-logo {
+    width: min(82%, 280px);
+  }
+
+  .experience-details {
+    padding: 8px 2px 4px;
+  }
+
+  .experience-role-header {
+    align-items: flex-start;
+  }
+}
+
+@media (max-width: 420px) {
+  .experience-role-header {
+    flex-direction: column;
+  }
+
+  .experience-description {
+    padding-left: 14px;
+  }
+}
+
+/* ============================================================
    Certificates — Watercolor Scrapbook Gallery
    ============================================================ */
 .watercolor-certificates {
@@ -3155,7 +3786,7 @@
   border-radius: 14px 34px 20px 28px;
   background:
     linear-gradient(116deg, rgba(255, 252, 252, 0.94), rgba(246, 234, 235, 0.88)),
-    #F5E7E8;
+    var(--bg-blush);
   box-shadow: 0 18px 45px rgba(58, 5, 25, 0.07), inset 0 0 0 7px rgba(255, 255, 255, 0.35);
 }
 
@@ -3578,7 +4209,7 @@
   border-radius: 32px 14px 39px 18px;
   background:
     linear-gradient(116deg, rgba(255, 252, 252, 0.96), rgba(246, 234, 235, 0.92)),
-    #F5E7E8;
+    var(--bg-blush);
   box-shadow: 0 18px 45px rgba(58, 5, 25, 0.08), inset 0 0 0 7px rgba(255, 255, 255, 0.35);
   opacity: 1 !important;
 }
